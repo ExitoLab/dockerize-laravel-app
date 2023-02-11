@@ -1,5 +1,17 @@
 version: "3.7"
 services:
+  db:
+    image: mysql:8.0
+    container_name: abc-article-network-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - abc-article-network
+
   app:
     build:
       args:
@@ -7,31 +19,23 @@ services:
         uid: 1000
       context: ./
       dockerfile: Dockerfile
-    image: travellist
-    container_name: travellist-app
+    image: abc-article
+    container_name: abc-article
     restart: unless-stopped
-    working_dir: /var/www/
+    working_dir: /app
+    env_file:
+    - .env
+    ports:
+      - "8000:8181"
+    links:
+      - db
+    depends_on:
+      - db
     volumes:
       - ./:/var/www
     networks:
-      - travellist
-
-  db:
-    image: mysql:8.0
-    container_name: travellist-db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    volumes:
-      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-    networks:
-      - travellist
+      - abc-article-network
 
 networks:
-  travellist:
+  abc-article-network:
     driver: bridge
