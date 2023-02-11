@@ -2,31 +2,24 @@ version: "3.7"
 services:
   db:
     image: mysql:8.0
-    container_name: abc-article-network-db
-    restart: unless-stopped
+    container_name: mysql
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
     networks:
-      - abc-article-network
+      - article-api-network
 
   app:
     build:
-      args:
-        user: sammy
-        uid: 1000
       context: ./
       dockerfile: Dockerfile
-    image: abc-article
-    container_name: abc-article
-    restart: unless-stopped
+    image: article-api
+    container_name: article-api
     working_dir: /app
     env_file:
     - .env
     ports:
-      - "8000:8181"
+      - "8080:8080"
     links:
       - db
     depends_on:
@@ -34,8 +27,8 @@ services:
     volumes:
       - ./:/var/www
     networks:
-      - abc-article-network
+      - article-api-network
 
 networks:
-  abc-article-network:
+  article-api-network:
     driver: bridge
