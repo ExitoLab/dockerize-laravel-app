@@ -32,3 +32,7 @@ compose-ps: ## List containers
 .PHONY: docker-scan
 docker-scan: ## Scan docker image after building
 	docker scan api
+
+.PHONY: docker-push
+docker-push: ## Build the docker image and push to GCR
+	docker build . -t gcr.io/fleet-pillar-238009/article-api:latest && docker push gcr.io/fleet-pillar-238009/article-api:latest
